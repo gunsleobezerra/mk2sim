@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>BOSS RC-505 MkII — Virtual Clone</title>
+    <link rel="stylesheet" href="./styles/rc505_hardware.css" />
+  </head>
+  <body>
+    <div class="stage">
+      <main class="chassis" id="chassis" aria-label="BOSS RC-505 MkII virtual clone">
+        <header class="brand-row">
+          <div class="brand">
+            <span class="brand-boss">BOSS</span>
+            <span class="brand-model">RC-505<span class="brand-mk">mkII</span></span>
+            <span class="brand-tag">LOOP STATION · VIRTUAL CLONE</span>
+          </div>
+          <div class="status-cluster">
+            <div class="status-item">
+              <span class="led" id="led-engine" aria-hidden="true"></span>
+              <span>ENGINE</span>
+            </div>
+            <div class="status-item">
+              <span class="led" id="led-midi" aria-hidden="true"></span>
+              <span>MIDI</span>
+            </div>
+            <div class="status-item">
+              <span class="readout" id="backend-label">--</span>
+            </div>
+          </div>
+        </header>
+
+        <section class="top-panel">
+          <div class="panel-block" id="input-fx-panel"></div>
+          <div class="panel-block lcd-block" id="lcd-mount"></div>
+          <div class="panel-block" id="rhythm-panel"></div>
+        </section>
+
+        <section class="transport-row" aria-label="Transport">
+          <div class="transport-group">
+            <button class="hw-btn rec" data-transport="record" title="Record all tracks">
+              <span class="hw-led red"></span> REC ALL
+            </button>
+            <button class="hw-btn" data-transport="stop" title="Stop all tracks">
+              <span class="hw-led blue"></span> STOP ALL
+            </button>
+            <button class="hw-btn" data-transport="clear" title="Clear all tracks">
+              <span class="hw-led amber"></span> CLEAR
+            </button>
+          </div>
+
+          <div class="transport-group tempo-group">
+            <label class="field">
+              <span class="field-label">BPM</span>
+              <input id="bpm-input" class="numeric-input" type="number" min="20" max="300" step="0.1" value="120" />
+            </label>
+            <button class="hw-btn tap" id="tap-tempo" title="Tap tempo">TAP</button>
+            <label class="field">
+              <span class="field-label">QUANTIZE</span>
+              <select id="quantize-select" class="hw-select"></select>
+            </label>
+            <label class="field">
+              <span class="field-label">SYNC</span>
+              <select id="sync-select" class="hw-select"></select>
+            </label>
+            <label class="field">
+              <span class="field-label">INPUT</span>
+              <select id="input-mode-select" class="hw-select">
+                <option value="0">Live</option>
+                <option value="1">Demo tone</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="transport-group">
+            <div class="meter-block" title="Input level">
+              <span class="field-label">IN</span>
+              <div class="meter"><div class="meter-fill" id="input-meter"></div></div>
+            </div>
+            <div class="meter-block" title="Audio thread CPU">
+              <span class="field-label">CPU</span>
+              <div class="meter"><div class="meter-fill cpu" id="cpu-meter"></div></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="tracks" id="track-grid" aria-label="Tracks"></section>
+
+        <section class="fx-grid" id="fx-grid" aria-label="Effect assign"></section>
+
+        <section class="device-row" aria-label="MIDI and plugins">
+          <div class="device-group">
+            <span class="field-label">MIDI IN</span>
+            <select id="midi-port" class="hw-select" aria-label="MIDI input port"></select>
+            <button class="hw-btn small" id="midi-refresh" type="button">SCAN</button>
+            <button class="hw-btn small" id="midi-connect" type="button">CONNECT</button>
+          </div>
+          <div class="device-group">
+            <span class="field-label">VST3</span>
+            <select id="plugin-list" class="hw-select" aria-label="Installed plugins"></select>
+            <button class="hw-btn small" id="plugin-scan" type="button">SCAN</button>
+            <button class="hw-btn small" id="plugin-load" type="button">LOAD</button>
+          </div>
+          <div class="device-group grow">
+            <span class="field-label">ENGINE</span>
+            <span class="readout" id="engine-detail">initialising…</span>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <span>5 TRACKS · 20 s PER TRACK · OVERDUB · UNDO/REDO · REVERSE · 1SHOT</span>
+          <span id="midi-status">MIDI: not connected</span>
+          <span>TAURI v2 · RUST · CPAL · 60 fps IPC</span>
+        </footer>
+      </main>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,234 @@
+{
+  "project": "BOSS RC-505 MkII Virtual Clone",
+  "architecture": "Tauri v2 + Rust Backend + Web Frontend (HTML5/CSS3/SVG)",
+  "description": "Plano de tarefas divididas por agentes especializados para o desenvolvimento do clone virtual do BOSS RC-505 MkII.",
+  "agents": [
+    {
+      "agent_id": "agent_01_architect",
+      "role": "Engenheiro Arquiteto de Software & Lead Developer",
+      "responsibilities": [
+        "Configuração da estrutura do repositório Tauri v2 e Rust",
+        "Definição das rotas IPC e eventos de streaming de estado entre Rust e Frontend",
+        "Garantia dos padrões de alta prioridade da áudio thread e isolamento lock-free"
+      ],
+      "tasks": [
+        {
+          "task_id": "ARCH-01",
+          "title": "Inicialização da Estrutura do Projeto Tauri v2",
+          "description": "Criar a estrutura base do repositório rc505_tauri_clone com pastas src-tauri e ui.",
+          "files": [
+            "src-tauri/Cargo.toml",
+            "src-tauri/src/main.rs",
+            "ui/index.html"
+          ],
+          "dependencies": []
+        },
+        {
+          "task_id": "ARCH-02",
+          "title": "Configuração de Comunicação IPC e Eventos Assíncronos",
+          "description": "Configurar Tauri Commands para ações síncronas/assíncronas e Event Streaming a 60fps para sincronização de estado e LEDs dos canais.",
+          "files": [
+            "src-tauri/src/main.rs",
+            "ui/src/app.js"
+          ],
+          "dependencies": [
+            "ARCH-01"
+          ]
+        }
+      ]
+    },
+    {
+      "agent_id": "agent_02_audio_dsp",
+      "role": "Engenheiro de Áudio Digital & DSP em Rust",
+      "responsibilities": [
+        "Desenvolvimento do motor de áudio multitrack em tempo real de baixa latência",
+        "Implementação da lógica dos 5 buffers estéreo de gravação, playback e overdub",
+        "Criação dos algoritmos de DSP e efeitos nativos"
+      ],
+      "tasks": [
+        {
+          "task_id": "AUDIO-01",
+          "title": "Configuração do Motor CPAL e Lock-Free Buffers",
+          "description": "Configurar cpal com suporte a ASIO, CoreAudio e ALSA/JACK. Implementar ringbuf para troca de dados thread-safe sem travar a áudio thread.",
+          "files": [
+            "src-tauri/src/audio/engine.rs"
+          ],
+          "dependencies": [
+            "ARCH-01"
+          ]
+        },
+        {
+          "task_id": "AUDIO-02",
+          "title": "Gerenciamento das 5 Pistas (Looper Multi-Buffer)",
+          "description": "Implementar a lógica de pistas em track.rs com estados (Stopped, Recording, Playing, Overdubbing), suporte a Overdub ilimitado, Undo/Redo, Reverse, 1Shot e Dub Modes (Overdub, Replace1, Replace2).",
+          "files": [
+            "src-tauri/src/audio/track.rs"
+          ],
+          "dependencies": [
+            "AUDIO-01"
+          ]
+        },
+        {
+          "task_id": "AUDIO-03",
+          "title": "Motor de Clock, BPM e Quantização (Loop Sync & Tempo Sync)",
+          "description": "Desenvolver detecção de BPM (Loop-to-Tempo pela 1ª pista) e quantização estrita (Off, 1/16, 1/8, 1/4, 1 Bar, 2 Bars). Implementar modos de sync (Immediate, Measure, Loop Length).",
+          "files": [
+            "src-tauri/src/audio/clock.rs"
+          ],
+          "dependencies": [
+            "AUDIO-02"
+          ]
+        },
+        {
+          "task_id": "AUDIO-04",
+          "title": "Processamento de Efeitos DSP Nativos (Input FX / Track FX)",
+          "description": "Implementar efeitos nativos em Rust: Delay, Reverb, Filtros LPF/BPF/HPF, Phaser, Flanger, Pitch Shifter, Beat Repeat/Slicer, Transpose e Reverse Delay.",
+          "files": [
+            "src-tauri/src/dsp/effects.rs"
+          ],
+          "dependencies": [
+            "AUDIO-01"
+          ]
+        },
+        {
+          "task_id": "AUDIO-05",
+          "title": "Módulo Rhythm e Bateria Interna",
+          "description": "Implementar gerador de ritmo com gêneros, padrões (Acoustic, Rock, Electro, Guide), variações A-D, beats (2/4 a 15/8) e modos de Start/Stop Trigger.",
+          "files": [
+            "src-tauri/src/dsp/rhythm.rs"
+          ],
+          "dependencies": [
+            "AUDIO-03"
+          ]
+        }
+      ]
+    },
+    {
+      "agent_id": "agent_03_midi_plugins",
+      "role": "Especialista em MIDI e Hospedagem de Plugins VST3/AU",
+      "responsibilities": [
+        "Integração de entrada/saída MIDI e sincronização de relógio de tempo",
+        "Hospedagem FFI de plugins de terceiros (VST3 / AU)"
+      ],
+      "tasks": [
+        {
+          "task_id": "MIDI-01",
+          "title": "Conectividade e Mapeamento MIDI com midir",
+          "description": "Implementar midir para captura de mensagens CC, Note-On/Off e MIDI Clock Sync (RX/TX channels). Mapear control pedal e assign 1-16.",
+          "files": [
+            "src-tauri/src/midi/controller.rs"
+          ],
+          "dependencies": [
+            "ARCH-01"
+          ]
+        },
+        {
+          "task_id": "MIDI-02",
+          "title": "Host de Plugins VST3/AU e Roteamento FFI",
+          "description": "Desenvolver binding FFI para carregamento de VST3/AU externos em Input FX, Track FX e suporte a VSTi em canais MIDI.",
+          "files": [
+            "src-tauri/src/audio/plugin_host.rs"
+          ],
+          "dependencies": [
+            "AUDIO-01"
+          ]
+        }
+      ]
+    },
+    {
+      "agent_id": "agent_04_frontend_ui",
+      "role": "Desenvolvedor Frontend UI/UX (Web / Hardware Replica)",
+      "responsibilities": [
+        "Construção da interface réplica do chassi do BOSS RC-505 MkII",
+        "Animação de anéis de LED em SVG/Canvas a 60fps",
+        "Componentes de Faders, Display LCD e Grade de FX"
+      ],
+      "tasks": [
+        {
+          "task_id": "UI-01",
+          "title": "Estilização do Chassi e Tiras das 5 Pistas (TrackStrip)",
+          "description": "Criar CSS e componentes HTML para as 5 tiras de canal: faders verticais de volume, botões de Mute/Stop, Track Edit e ativadores de FX.",
+          "files": [
+            "ui/styles/rc505_hardware.css",
+            "ui/src/components/TrackStrip.js"
+          ],
+          "dependencies": [
+            "ARCH-01"
+          ]
+        },
+        {
+          "task_id": "UI-02",
+          "title": "Anel de LED Animado (SVG/Canvas - Status e Rotação do Loop)",
+          "description": "Desenvolver o anel circular iluminado para o botão Play/Rec/Dub com animação em tempo real das cores (Verde=Play, Vermelho=Rec, Amarelo=Dub, Azul=Stopped) e posição do loop.",
+          "files": [
+            "ui/src/components/TrackStrip.js"
+          ],
+          "dependencies": [
+            "UI-01"
+          ]
+        },
+        {
+          "task_id": "UI-03",
+          "title": "Painel Superior e Display LCD Central",
+          "description": "Construir display LCD retro estilar com informações de BPM, nome do Memory Patch, tempo e Quantize. Adicionar botões A-D para Input/Track FX.",
+          "files": [
+            "ui/src/components/LCDDisplay.js",
+            "ui/index.html"
+          ],
+          "dependencies": [
+            "UI-01"
+          ]
+        },
+        {
+          "task_id": "UI-04",
+          "title": "Integração IPC com Eventos do Rust",
+          "description": "Conectar o frontend ao Tauri Event Stream para atualizar faders, botões, posições de loop e tela LCD dinamicamente sem perdas de quadros.",
+          "files": [
+            "ui/src/app.js"
+          ],
+          "dependencies": [
+            "ARCH-02",
+            "UI-02",
+            "UI-03"
+          ]
+        }
+      ]
+    },
+    {
+      "agent_id": "agent_05_qa_validation",
+      "role": "Engenheiro de QA, Testes & Validação de Parâmetros",
+      "responsibilities": [
+        "Testes unitários e de integração de baixa latência",
+        "Validação rigorosa do comportamento frente ao manual de parâmetros do RC-505 MkII"
+      ],
+      "tasks": [
+        {
+          "task_id": "QA-01",
+          "title": "Suíte de Testes Unitários dos Buffers e DSP em Rust",
+          "description": "Escrever testes unitários em Rust para gravação, overdub, undo/redo, quantização e filtros DSP.",
+          "files": [
+            "src-tauri/src/audio/track.rs",
+            "src-tauri/src/dsp/effects.rs"
+          ],
+          "dependencies": [
+            "AUDIO-02",
+            "AUDIO-04"
+          ]
+        },
+        {
+          "task_id": "QA-02",
+          "title": "Validação e Mapeamento de Parâmetros RC-505 MkII",
+          "description": "Validar menus de sistema, parâmetros de memória (Pan, 1Shot, Start/Stop Mode, Dub Mode, EQ de 4 bandas, Dynamics Comp/NS) e matriz de ASSIGN 1-16 conforme especificação oficial do BOSS RC-505 MkII.",
+          "files": [
+            "src-tauri/src/audio/track.rs",
+            "src-tauri/src/midi/controller.rs"
+          ],
+          "dependencies": [
+            "QA-01",
+            "MIDI-01"
+          ]
+        }
+      ]
+    }
+  ]
+}
